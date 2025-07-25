@@ -51,16 +51,11 @@ h3, .underline {
   text-decoration: underline;
   text-underline-offset: 0.25rem;
 }
-::selection {
-  background: var(--text);
-  color: var(--bg);
-  text-shadow: none;
-}
-::-moz-selection {
-  background: var(--text);
-  color: var(--bg);
-  text-shadow: none;
-}
+::selection { background: var(--text); color: var(--bg); }
+::-moz-selection { background: var(--text); color: var(--bg); }
+input::selection { background: salmon; color: var(--text); }
+input::-moz-selection { background: var(--text); color: var(--bg); }
+
 footer p {
   margin-bottom: 0;
 }
