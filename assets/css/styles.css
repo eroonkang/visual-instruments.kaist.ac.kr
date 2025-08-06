@@ -8,7 +8,7 @@
 body {
   background-color: var(--bg);
   font-family: Times, serif;
-  line-height: 1.25;
+  line-height: 1.3;
   font-size: 1.1rem;
   position: relative;
   letter-spacing: 0.005em;
@@ -18,7 +18,7 @@ h1 {
   font-size: 2rem;
   line-height: 0.9;
 }
-h1.ml-ko { 
+h1 .ml-ko { 
   font-family: pretendard, sans-serif; 
   line-height: 0.95;
 }
@@ -27,12 +27,15 @@ h2 {
 }
 h2 .ml-ko { 
   font-family: pretendard, sans-serif; 
+  line-height: 1.4;
 }
 h3 .ml-ko,
-p .ml-ko { 
+p .ml-ko,
+li .ml-ko { 
   font-family: sandoll-myeongjoneo1, serif; 
   font-size: 92%; 
-  line-height: 1.5;
+  line-height: 1.6;
+  letter-spacing: -0.006em;
   /* word-break: keep-all; */
 }
 h1, h1 > span, 
@@ -41,10 +44,10 @@ a {
   color: var(--text);
   text-decoration: none;
 }
-p a {
+p a, li a {
   border-bottom: 1px dotted var(--text);
 }
-p a:hover {
+p a:hover, li a:hover {
   border-bottom: 1px dashed var(--text);
 }
 h3, .underline {
@@ -60,7 +63,21 @@ footer p {
   margin-bottom: 0;
 }
 
-/* Newsletter: Mailerlite overrides */
+#floret:before {
+  width: 1rem;
+  display: inline-block;
+  content: "";
+  animation: floret-content 1s infinite steps(4, end);
+}
+
+@keyframes floret-content {
+  0%, 24.99% { content: "✦"; }
+  25%, 49.99% { content: "✶"; }
+  50%, 74.99% { content: "✷"; }
+  75%, 99.99% { content: "✴"; }
+}
+
+/* Newsletter: Mailerlite overrides ---------------- */
 
 /* container to set height before js */
 div.newsletter {

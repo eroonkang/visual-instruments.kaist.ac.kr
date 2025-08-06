@@ -1,12 +1,20 @@
-// Multiliungual init
-$(document).ready(function(e){
-  $(".ml").multilingual([
-    "en", "ko"
-  ]);
+// Initialize the multilingual library with configuration
+Multilingual.init({
+    autoWrap: true,
+    autoWrapSelector: 'body',
+    // debug: true,
+    glyphOverrides: {
+        // '()[]{}': 'latin',    // Treat parentheses and brackets as Latin
+        // '،؛؟': 'arabic',      // Arabic punctuation stays with Arabic
+    },
+    cssClasses: {
+        // wrapper: 'multilingual-segment',
+        useShortNames: true   // Use ml-ko, ml-en class names
+    }
 });
 
 // Timestamp functionality
-$(document).ready(function() {
+document.addEventListener('DOMContentLoaded', function() {
   function updateTimestamp() {
     const now = new Date();
     // Format directly in Seoul timezone
@@ -18,16 +26,19 @@ $(document).ready(function() {
       hour: '2-digit',
       minute: '2-digit',
       second: '2-digit'
-    }).replace(' ', ' ') + ' (KST)';
-    document.getElementById('current-date').textContent = kstString;
+    }).replace(' ', ' ') + ' KST';
+    const element = document.getElementById('current-date');
+    if (element) {
+      element.textContent = kstString;
+    }
   }
   updateTimestamp();
   setInterval(updateTimestamp, 1000);
 });
 
 // Cell division pie chart animation
-$(document).ready(function() {
-  var $overlay = $('.overlay');
+document.addEventListener('DOMContentLoaded', function() {
+  var overlay = document.querySelector('.overlay');
   var duration = 30000; // seconds per cycle
   var startTime = Date.now();
   var currentState = 1; // 1, 2, 4 for landscape; 2, 4, 8 for portrait
@@ -116,13 +127,13 @@ $(document).ready(function() {
     for (var i = 0; i < count; i++) {
       svgHTML += createSVG(i, count);
     }
-    $overlay.html(svgHTML);
+    overlay.innerHTML = svgHTML;
     currentState = count;
     cycleStartTime = Date.now();
   }
   
   // Handle window resize to update layout and reset to appropriate starting state
-  $(window).on('resize', function() {
+  window.addEventListener('resize', function() {
     var isPortrait = window.innerWidth < window.innerHeight;
     // Reset to starting state for the orientation
     if (isPortrait && currentState === 1) {
@@ -141,9 +152,10 @@ $(document).ready(function() {
     var isPortrait = window.innerWidth < window.innerHeight;
     
     // Update all pie paths
-    $('.pie-path').each(function() {
+    var piePaths = document.querySelectorAll('.pie-path');
+    piePaths.forEach(function(path) {
       var pathData = createPiePath(currentAngle);
-      $(this).attr('d', pathData);
+      path.setAttribute('d', pathData);
     });
     
     // Check if cycle is complete and we need to divide
@@ -179,9 +191,9 @@ $(document).ready(function() {
 });
 
 // Image cycling functionality
-$(document).ready(function() {
-  var $images = $('.tags img');
-  var totalImages = $images.length;
+document.addEventListener('DOMContentLoaded', function() {
+  var images = document.querySelectorAll('.tags img');
+  var totalImages = images.length;
   var visibleCount = 6;
   var currentIndex = 0;
   var interval;
@@ -191,10 +203,17 @@ $(document).ready(function() {
   var pauseIndex = 6; // Index that shows images 5,6,7,8,9 (0-based: 4,5,6,7,8)
   
   function showImages() {
-    $images.hide();
+    // Hide all images
+    images.forEach(function(img) {
+      img.style.display = 'none';
+    });
+    
+    // Show visible range
     for (var i = 0; i < visibleCount; i++) {
       var imageIndex = currentIndex + i;
-      $images.eq(imageIndex).show();
+      if (images[imageIndex]) {
+        images[imageIndex].style.display = 'block';
+      }
     }
   }
   
@@ -220,6 +239,32 @@ $(document).ready(function() {
   
   // Start with normal interval
   interval = setInterval(nextSlide, normalInterval);
+});
+
+// Floret click handler for scroll to top and focus
+document.addEventListener('DOMContentLoaded', function() {
+  const floretElement = document.getElementById('floret');
+  if (floretElement) {
+    floretElement.parentElement.addEventListener('click', function() {
+      // Scroll to top smoothly
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
+      
+      // Wait for scroll to complete, then focus on newsletter input
+      setTimeout(function() {
+        // Look for MailerLite input field
+        const newsletterInput = document.querySelector('.ml-embedded input[type="email"]') || 
+                              document.querySelector('.newsletter input[type="email"]') ||
+                              document.querySelector('input[type="email"]');
+        
+        if (newsletterInput) {
+          newsletterInput.focus();
+        }
+      }, 800); // Give scroll animation time to complete
+    });
+  }
 });
 
 // Adobe typekit loader
