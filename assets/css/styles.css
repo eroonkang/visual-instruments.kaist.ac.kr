@@ -74,7 +74,7 @@ footer p {
   0%, 24.99% { content: "✦"; }
   25%, 49.99% { content: "✶"; }
   50%, 74.99% { content: "✷"; }
-  75%, 100% { content: "✳"; }
+  75%, 100% { content: "⚹"; }
 }
 
 /* Newsletter: Mailerlite overrides ---------------- */
