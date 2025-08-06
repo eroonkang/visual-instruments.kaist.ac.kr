@@ -44,6 +44,10 @@ document.addEventListener('DOMContentLoaded', function() {
   var currentState = 1; // 1, 2, 4 for landscape; 2, 4, 8 for portrait
   var cycleStartTime = Date.now();
   
+  // iOS detection
+  var isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+  var scrollTimeout;
+  
   function createSVG(index, total) {
     var centerX = 500;
     var centerY = 500;
@@ -182,6 +186,20 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     requestAnimationFrame(animateCells);
+  }
+  
+  // iOS-specific scroll handling to prevent animation restart
+  if (isIOS) {
+    function handleIOSScroll() {
+      clearTimeout(scrollTimeout);
+      scrollTimeout = setTimeout(function() {
+        // Reset cycle timing after scroll momentum ends
+        cycleStartTime = Date.now();
+      }, 100);
+    }
+    
+    window.addEventListener('scroll', handleIOSScroll, { passive: true });
+    window.addEventListener('touchend', handleIOSScroll, { passive: true });
   }
   
   // Initialize with appropriate starting state based on orientation
