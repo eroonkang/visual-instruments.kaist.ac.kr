@@ -241,6 +241,25 @@ document.addEventListener('DOMContentLoaded', function() {
   interval = setInterval(nextSlide, normalInterval);
 });
 
+// MailerLite form fade-in when ready
+document.addEventListener('DOMContentLoaded', function() {
+  function checkNewsletterReady() {
+    const newsletter = document.querySelector('.newsletter');
+    const mlForm = document.querySelector('.ml-embedded .ml-form-embedContainer');
+    
+    if (newsletter && mlForm) {
+      // MailerLite form is loaded, fade it in
+      newsletter.classList.add('ready');
+    } else {
+      // Check again in 100ms
+      setTimeout(checkNewsletterReady, 100);
+    }
+  }
+  
+  // Start checking after a brief delay to allow MailerLite to initialize
+  setTimeout(checkNewsletterReady, 200);
+});
+
 // Floret click handler for scroll to top and focus
 document.addEventListener('DOMContentLoaded', function() {
   const floretElement = document.getElementById('floret');

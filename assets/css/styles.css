@@ -67,14 +67,14 @@ footer p {
   width: 1rem;
   display: inline-block;
   content: "";
-  animation: floret-content 1s infinite steps(4, end);
+  animation: floret-content 1s infinite;
 }
 
 @keyframes floret-content {
   0%, 24.99% { content: "✦"; }
   25%, 49.99% { content: "✶"; }
   50%, 74.99% { content: "✷"; }
-  75%, 99.99% { content: "✴"; }
+  75%, 100% { content: "✳"; }
 }
 
 /* Newsletter: Mailerlite overrides ---------------- */
@@ -85,6 +85,26 @@ div.newsletter {
   border: 1px solid var(--text);
   height: var(--newsletter-height);
   position: relative;
+}
+div.newsletter .ml-embedded {
+  opacity: 0;
+  transition: opacity 0.15s ease-in-out;
+}
+/* fade in when ready */
+div.newsletter.ready .ml-embedded {
+  opacity: 1;
+}
+div.newsletter .loading {
+  margin-top: -1px;
+  width: 50%;
+  height: calc(var(--newsletter-height) / 1);
+  border-right: 1px solid var(--text);
+  animation: loading 7s infinite;
+}
+@keyframes loading {
+  0% { width: 0; }
+  50% { width: 100%; }
+  100% { width: 0; }
 }
 /* reset Mailerlite styles */
 .ml-form-embedContainer * {
