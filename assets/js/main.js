@@ -47,6 +47,8 @@ document.addEventListener('DOMContentLoaded', function() {
   // iOS detection
   var isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
   var scrollTimeout;
+  var lastFrameTime = null;
+  var accumulatedTime = 0;
   
   function createSVG(index, total) {
     var centerX = 500;
@@ -133,7 +135,14 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     overlay.innerHTML = svgHTML;
     currentState = count;
-    cycleStartTime = Date.now();
+    
+    // Reset timing appropriately for each platform
+    if (isIOS) {
+      accumulatedTime = 0;
+      lastFrameTime = null;
+    } else {
+      cycleStartTime = Date.now();
+    }
   }
   
   // Handle window resize to update layout and reset to appropriate starting state
@@ -150,7 +159,25 @@ document.addEventListener('DOMContentLoaded', function() {
   });
   
   function animateCells() {
-    var elapsed = Date.now() - cycleStartTime;
+    var currentTime = Date.now();
+    
+    // Use frame-based timing for iOS to handle momentum scrolling
+    if (isIOS) {
+      if (lastFrameTime === null) {
+        lastFrameTime = currentTime;
+      }
+      var deltaTime = currentTime - lastFrameTime;
+      // Cap delta time to prevent jumps during scroll interruptions
+      deltaTime = Math.min(deltaTime, 100); // Max 100ms per frame
+      accumulatedTime += deltaTime;
+      lastFrameTime = currentTime;
+      
+      var elapsed = accumulatedTime;
+    } else {
+      // Use wall clock time for desktop
+      var elapsed = currentTime - cycleStartTime;
+    }
+    
     var progress = (elapsed % duration) / duration;
     var currentAngle = progress * 360;
     var isPortrait = window.innerWidth < window.innerHeight;
@@ -193,8 +220,8 @@ document.addEventListener('DOMContentLoaded', function() {
     function handleIOSScroll() {
       clearTimeout(scrollTimeout);
       scrollTimeout = setTimeout(function() {
-        // Reset cycle timing after scroll momentum ends
-        cycleStartTime = Date.now();
+        // Reset frame-based timing after scroll momentum ends
+        lastFrameTime = null;
       }, 100);
     }
     
