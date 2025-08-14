@@ -165,6 +165,7 @@ input:focus::placeholder {
 .ml-embedded #mlb2-28678024.ml-form-embedContainer .ml-form-embedWrapper .ml-form-embedBody .ml-form-fieldRow 
 input:focus-visible {
   outline: 8px dashed var(--text) !important;
+  padding-right: 4rem !important;
 }
 /* button */
 .ml-embedded #mlb2-28678024.ml-form-embedContainer .ml-form-embedWrapper .ml-form-embedBody .ml-form-embedSubmit 
