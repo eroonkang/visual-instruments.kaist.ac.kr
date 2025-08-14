@@ -201,7 +201,7 @@ button {
 }
 /* custom success message */
 .ml-embedded #mlb2-28678024.ml-form-embedContainer .ml-form-embedWrapper .ml-form-successBody .ml-form-successContent::after {
-  content: "Subscribed ✴";
+  content: "Subscribed ✶";
   font-family: neue-haas-grotesk-display, sans-serif !important;
   font-weight: 500 !important;
   font-size: 2.5rem !important;
