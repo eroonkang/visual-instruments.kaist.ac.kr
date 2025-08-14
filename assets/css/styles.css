@@ -16,7 +16,7 @@ h1, h2, h3, p {
   background-image: 
     radial-gradient(rgb(0, 0, 0) 18%, transparent 18%),
     radial-gradient(rgb(0, 0, 0) 18%, transparent 18%);
-  background-position: 0px 0px, 4px 4px;
+  background-position: 2px 2px, 6px 6px;
   background-size: 8px 8px;
   color: transparent;  
 }
