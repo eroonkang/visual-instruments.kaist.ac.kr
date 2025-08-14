@@ -4,6 +4,23 @@
   --newsletter-height: 3.5rem;
 }
 
+h1, h2, h3, p {
+  transition: color 0.5s ease-in-out;
+}
+.wf-loading h1, 
+.wf-loading h2, 
+.wf-loading h3, 
+.wf-loading h3, 
+.wf-loading p, 
+.wf-loading p a {
+  background-image: 
+    radial-gradient(rgb(0, 0, 0) 18%, transparent 18%),
+    radial-gradient(rgb(0, 0, 0) 18%, transparent 18%);
+  background-position: 0px 0px, 4px 4px;
+  background-size: 8px 8px;
+  color: transparent;  
+}
+
 /* defaults */
 body {
   background-color: var(--bg);
@@ -85,6 +102,12 @@ div.newsletter {
   border: 1px solid var(--text);
   height: var(--newsletter-height);
   position: relative;
+  /* background-image: 
+    radial-gradient(rgb(0, 0, 0) 18%, transparent 18%),
+    radial-gradient(rgb(0, 0, 0) 18%, transparent 18%);
+  background-position: 0px 0px, 4px 4px;
+  background-size: 8px 8px; */
+  color: transparent;
 }
 div.newsletter .ml-embedded {
   opacity: 0;

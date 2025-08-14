@@ -49,6 +49,9 @@ document.addEventListener('DOMContentLoaded', function() {
   var scrollTimeout;
   var lastFrameTime = null;
   var accumulatedTime = 0;
+  var isScrolling = false;
+  var animationPaused = false;
+  var pausedTime = 0;
   
   function createSVG(index, total) {
     var centerX = 500;
@@ -93,6 +96,11 @@ document.addEventListener('DOMContentLoaded', function() {
       // Only in portrait mode
       svgWidth = '100%';
       svgHeight = '12.5%';
+      floatStyle = 'none';
+    } else if (total === 16) {
+      // Only in very tall portrait mode (height > 2x width)
+      svgWidth = '100%';
+      svgHeight = '6.25%';
       floatStyle = 'none';
     }
     
@@ -145,13 +153,21 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   }
   
+  function isTallPortrait() {
+    return window.innerHeight > window.innerWidth * 2;
+  }
+  
   // Handle window resize to update layout and reset to appropriate starting state
   window.addEventListener('resize', function() {
     var isPortrait = window.innerWidth < window.innerHeight;
+    var isTall = isTallPortrait();
+    
     // Reset to starting state for the orientation
-    if (isPortrait && currentState === 1) {
-      updateSVGs(2); // Portrait starts with 2
-    } else if (!isPortrait && (currentState === 8 || currentState === 2)) {
+    if (isPortrait && !isTall && (currentState === 1 || currentState === 16)) {
+      updateSVGs(2); // Normal portrait starts with 2
+    } else if (isPortrait && isTall && (currentState === 1 || currentState === 2 || currentState === 8)) {
+      updateSVGs(4); // Tall portrait starts with 4
+    } else if (!isPortrait && (currentState === 8 || currentState === 2 || currentState === 16)) {
       updateSVGs(1); // Landscape starts with 1
     } else {
       updateSVGs(currentState); // Just update layout
@@ -160,6 +176,23 @@ document.addEventListener('DOMContentLoaded', function() {
   
   function animateCells() {
     var currentTime = Date.now();
+    
+    // If animation is paused, don't update timing or angles
+    if (animationPaused) {
+      pausedTime = currentTime;
+      requestAnimationFrame(animateCells);
+      return;
+    }
+    
+    // If we just resumed from a pause, adjust timing to account for pause duration
+    if (pausedTime > 0) {
+      if (isIOS) {
+        lastFrameTime = currentTime;
+      } else {
+        cycleStartTime += (currentTime - pausedTime);
+      }
+      pausedTime = 0;
+    }
     
     // Use frame-based timing for iOS to handle momentum scrolling
     if (isIOS) {
@@ -192,13 +225,26 @@ document.addEventListener('DOMContentLoaded', function() {
     // Check if cycle is complete and we need to divide
     if (elapsed >= duration) {
       if (isPortrait) {
-        // Portrait sequence: 2 -> 4 -> 8 -> 2
-        if (currentState === 2) {
-          updateSVGs(4);
-        } else if (currentState === 4) {
-          updateSVGs(8);
-        } else if (currentState === 8) {
-          updateSVGs(2); // Reset to 2
+        var isTall = isTallPortrait();
+        
+        if (isTall) {
+          // Tall Portrait sequence (height > 2x width): 4 -> 8 -> 16 -> 4
+          if (currentState === 4) {
+            updateSVGs(8);
+          } else if (currentState === 8) {
+            updateSVGs(16);
+          } else if (currentState === 16) {
+            updateSVGs(4); // Reset to 4
+          }
+        } else {
+          // Normal Portrait sequence: 2 -> 4 -> 8 -> 2
+          if (currentState === 2) {
+            updateSVGs(4);
+          } else if (currentState === 4) {
+            updateSVGs(8);
+          } else if (currentState === 8) {
+            updateSVGs(2); // Reset to 2
+          }
         }
       } else {
         // Landscape sequence: 1 -> 2 -> 4 -> 1
@@ -215,23 +261,103 @@ document.addEventListener('DOMContentLoaded', function() {
     requestAnimationFrame(animateCells);
   }
   
-  // iOS-specific scroll handling to prevent animation restart
-  if (isIOS) {
-    function handleIOSScroll() {
-      clearTimeout(scrollTimeout);
-      scrollTimeout = setTimeout(function() {
-        // Reset frame-based timing after scroll momentum ends
-        lastFrameTime = null;
-      }, 100);
+  // Scroll handling to pause animation during scrolling
+  function pauseAnimation() {
+    if (!animationPaused) {
+      animationPaused = true;
+      pausedTime = Date.now();
     }
+  }
+  
+  function resumeAnimation() {
+    if (animationPaused) {
+      animationPaused = false;
+      // pausedTime will be used in animateCells to adjust timing
+    }
+  }
+  
+  // Handle scroll events with proper debouncing
+  var scrollEndTimeout;
+  var lastScrollTime = 0;
+  
+  function handleScrollStart() {
+    pauseAnimation();
+    lastScrollTime = Date.now();
+  }
+  
+  function handleScrollEnd() {
+    clearTimeout(scrollEndTimeout);
+    scrollEndTimeout = setTimeout(function() {
+      // Double-check that scrolling has actually stopped
+      if (Date.now() - lastScrollTime >= 150) {
+        resumeAnimation();
+      }
+    }, 150);
+  }
+  
+  // Use modern scrollend event if available, with fallback
+  var supportsScrollEnd = 'onscrollend' in window;
+  
+  if (supportsScrollEnd) {
+    // Modern browsers with scrollend support
+    document.addEventListener('scroll', handleScrollStart, { passive: true });
+    document.addEventListener('scrollend', resumeAnimation, { passive: true });
+  } else {
+    // Fallback for browsers without scrollend (like Safari)
+    var isScrolling = false;
     
-    window.addEventListener('scroll', handleIOSScroll, { passive: true });
-    window.addEventListener('touchend', handleIOSScroll, { passive: true });
+    document.addEventListener('scroll', function() {
+      handleScrollStart();
+      
+      if (!isScrolling) {
+        isScrolling = true;
+      }
+      
+      // Clear timeout and set a new one
+      clearTimeout(scrollEndTimeout);
+      scrollEndTimeout = setTimeout(function() {
+        isScrolling = false;
+        resumeAnimation();
+      }, 150);
+    }, { passive: true });
+  }
+  
+  // Additional iOS-specific handling for momentum scrolling and touch events
+  if (isIOS) {
+    // Pause on touch start (when user starts interacting)
+    document.addEventListener('touchstart', function() {
+      pauseAnimation();
+    }, { passive: true });
+    
+    // Handle touch end with longer timeout for momentum scrolling
+    document.addEventListener('touchend', function() {
+      clearTimeout(scrollEndTimeout);
+      scrollEndTimeout = setTimeout(function() {
+        if (Date.now() - lastScrollTime >= 200) {
+          resumeAnimation();
+        }
+      }, 200);
+    }, { passive: true });
+    
+    // Also handle touch cancel
+    document.addEventListener('touchcancel', function() {
+      clearTimeout(scrollEndTimeout);
+      scrollEndTimeout = setTimeout(resumeAnimation, 200);
+    }, { passive: true });
   }
   
   // Initialize with appropriate starting state based on orientation
   var isPortrait = window.innerWidth < window.innerHeight;
-  updateSVGs(isPortrait ? 2 : 1);
+  var isTall = isTallPortrait();
+  
+  if (isPortrait && isTall) {
+    updateSVGs(4); // Tall portrait starts with 4
+  } else if (isPortrait) {
+    updateSVGs(2); // Normal portrait starts with 2
+  } else {
+    updateSVGs(1); // Landscape starts with 1
+  }
+  
   animateCells();
 });
 
