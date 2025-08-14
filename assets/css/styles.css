@@ -171,9 +171,9 @@ input:focus-visible {
 .ml-embedded #mlb2-28678024.ml-form-embedContainer .ml-form-embedWrapper .ml-form-embedBody .ml-form-fieldRow input:-webkit-autofill:hover,
 .ml-embedded #mlb2-28678024.ml-form-embedContainer .ml-form-embedWrapper .ml-form-embedBody .ml-form-fieldRow input:-webkit-autofill:focus,
 .ml-embedded #mlb2-28678024.ml-form-embedContainer .ml-form-embedWrapper .ml-form-embedBody .ml-form-fieldRow input:-webkit-autofill:active  {
-    -webkit-box-shadow: none !important;
-    background-color: var(--text) !important;
-    background-clip: content-box !important;
+    -webkit-text-fill-color: var(--bg) !important;
+    -webkit-box-shadow: 0 0 0px 40rem var(--text) inset;
+
 }
 /* button */
 .ml-embedded #mlb2-28678024.ml-form-embedContainer .ml-form-embedWrapper .ml-form-embedBody .ml-form-embedSubmit 
