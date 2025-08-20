@@ -192,7 +192,7 @@ button {
   background-repeat: no-repeat !important;
   background-position: center !important;
   background-color: var(--text) !important;
-  border-left: 1px dashed var(--bg) !important;;
+  border-left: 1px solid rgba(255,255,255,0.3) !important;;
 }
 /* show button on focus */
 .ml-embedded #mlb2-28678024.ml-form-embedContainer .ml-form-embedWrapper .ml-form-embedBody .ml-form-formContent:has(input:focus-visible) + input + .ml-form-embedSubmit button{
