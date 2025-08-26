@@ -1,6 +1,7 @@
 /**
- * Multilingual Text Library
+ * multilingual.js
  * Detects writing systems and wraps text segments with appropriate language spans
+ * A rewrite of the original multilingual.js
  */
 
 // Default configuration settings
